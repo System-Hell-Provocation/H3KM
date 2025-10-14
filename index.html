@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>💸 Result Meter - H3KM: Haushalts-Kassen-Katastrophen-Modul 💸</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #1a1a1a; 
+            color: #00ff00; 
+            margin: 0; 
+            padding: 20px; 
+            line-height: 1.4;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            text-align: center; 
+            background: #004d00; 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            border: 2px solid #00ff00; 
+        }
+        .status-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .status-card { 
+            background: #2d2d2d; 
+            padding: 15px; 
+            border: 1px solid #00ff00; 
+            border-radius: 5px; 
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        .status-value { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            color: #ffff00; 
+        }
+        .actions-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 15px; 
+        }
+        .action-card { 
+            background: #333; 
+            padding: 15px; 
+            border: 1px solid #666; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .action-card:hover { 
+            border-color: #00ff00; 
+            background: #3a3a3a; 
+        }
+        .action-cost { color: #ff4444; font-weight: bold; }
+        .action-benefit { color: #44ff44; font-weight: bold; }
+        .log { 
+            background: #000; 
+            padding: 15px; 
+            margin-top: 20px; 
+            border: 1px solid #00ff00; 
+            height: 300px; 
+            overflow-y: auto; 
+        }
+        .critical { color: #ff4444; font-weight: bold; }
+        .warning { color: #ffaa00; font-weight: bold; }
+        .good { color: #44ff44; }
+        .next-turn-card { 
+            background: #4d0000; 
+            border-color: #ff4444; 
+            cursor: pointer; 
+            text-align: center; 
+            grid-column: 1 / -1; 
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>💸 DEUTSCHE HAUSHALTS-KASSE - H3KM (Jens Spahn Logic) 💸</h1>
+        <p>Was passiert nach der Logic eines Elephanten, wenn etwas in die andere Seite fließt?</p>
+    </div>
+    <div class="status-grid">
+        <div class="status-card">Staatskasse: <span id="money" class="status-value">0</span> Mrd €</div>
+        <div class="status-card">Staatsverschuldung: <span id="debt" class="status-value">0</span> Mrd €</div>
+        <div class="status-card">Wut der Bevölkerung: <span id="publicAnger" class="status-value">0</span>/100</div>
+        <div class="status-card">Korruptions-Index: <span id="corruptionIndex" class="status-value">0</span>/100</div>
+        <div class="status-card">Umweltschäden: <span id="environmentHarm" class="status-value">0</span>/100</div>
+        <div class="status-card">Skandal-Level: <span id="scandalLevel" class="status-value">0</span>/100</div>
+        <div class="status-card">Lobby-Einfluss: <span id="corporateLobby" class="status-value">0</span>/100</div>
+        <div class="status-card">Blutgeld-Index: <span id="bloodMoney" class="status-value">0</span>/100</div>
+        <div class="status-card">Armuts-Index: <span id="povertyIndex" class="status-value">0</span>/100</div>
+        <div class="status-card">Banker-Bonus-Vektor: <span id="bankerBonus" class="status-value">0</span>/100</div>
+    </div>
+    <h2>💼 Verfügbare "Spar"- und "Förder"-Maßnahmen (Runde: <span id="turn-count">0</span>):</h2>
+    <div class="actions-grid" id="actionButtons">
+        <div class="action-card next-turn-card" onclick="applyAction({id: 'next_turn', title: 'Runde fortsetzen (System-Update)', cost: 0, consequences: []})">
+            <strong style="color: #ffaa00;">➡️ SYSTEM-UPDATE ZWINGEND: NÄCHSTE RUNDE STARTEN</strong>
+        </div>
+    </div>
+    <div class="log" id="logContent">
+        <div>> Willkommen im realen Haushalts-Simulator! Wähle deine Maßnahmen...</div>
+    </div>
+</div>
+
+<script>
+class GermanBudgetSatire {
+    constructor() {
+        // Initialbudget in Millionen €
+        this.money = 500000;    // 500 Mrd € Startbudget
+        this.debt = 2500000;    // 2.5 Billionen € Schulden
+        
+        // Pipelines (in Millionen €)
+        this.pipelines = {
+            corporate_subsidies: 50000,
+            military_industrial: 60000,
+            social_cuts: 0,
+            banking_sector: 150000,
+            tax_gaps: 30000,
+            media_control: 5000,
+            failed_projects: 20000
+        };
+
+        // Gesellschaftliche Metriken
+        this.publicAnger = 25;
+        this.corruptionIndex = 30;
+        this.environmentHarm = 40;
+        this.scandalLevel = 15;
+        this.corporateLobby = 60;
+        this.bloodMoney = 20;
+        this.povertyIndex = 35; // Neu
+        this.bankerBonus = 45; // Neu
+        this.truthLevel = 50;
+        this.turn = 0;
+    }
+
+    applyAction(action) {
+        if (action.id === 'next_turn') {
+            return this.nextTurn();
+        }
+
+        if (action.cost > 0 && this.money < action.cost) {
+            return "❌ Zu wenig Geld in der Staatskasse!";
+        }
+
+        // Kosten anwenden
+        if (action.cost > 0) {
+            this.money -= action.cost;
+        } else {
+            this.money += Math.abs(action.cost); // Bei negativen Kosten: Einnahmen
+        }
+
+        // Pipeline aktualisieren
+        if (action.targetPipeline) {
+            this.pipelines[action.targetPipeline] += Math.abs(action.cost);
+        }
+
+        // Konsequenzen anwenden
+        let resultLog = `✅ ${action.title} durchgeführt`;
+        action.consequences.forEach(consequence => {
+            const value = this.calculateConsequenceValue(consequence);
+            this.applyConsequence(consequence, value);
+            resultLog += ` | ${consequence.metric}: ${consequence.operator === 'ADD' ? '+' : '-'} ${value}`;
+        });
+
+        // Automatische Skandale bei hohem Korruptionslevel
+        if (this.corruptionIndex > 70 && Math.random() > 0.7) {
+            this.scandalLevel = Math.min(100, this.scandalLevel + 10);
+            resultLog += ` | 💥 Korruptionsskandal! Skandal +10`;
+        }
+
+        this.checkGameEnd();
+        return resultLog;
+    }
+
+    calculateConsequenceValue(consequence) {
+        // Dynamische Berechnungen basierend auf aktuellen Werten
+        switch(consequence.metric) {
+            // Wut eskaliert mit Armut
+            case 'publicAnger':
+                return Math.floor(consequence.value * (1 + this.povertyIndex / 50));
+            // Skandale eskalieren mit Korruption
+            case 'scandalLevel':
+                return Math.floor(consequence.value * (1 + this.corruptionIndex / 50));
+            default:
+                return consequence.value;
+        }
+    }
+
+    applyConsequence(consequence, value) {
+        switch(consequence.metric) {
+            case 'money': // Geld ist anders, da es Millionen/Milliarden sind
+                this[consequence.metric] += (consequence.operator === 'ADD' ? value : -value);
+                break;
+            case 'debt':
+                this[consequence.metric] += (consequence.operator === 'ADD' ? value : -value);
+                break;
+            case 'publicAnger':
+            case 'corruptionIndex':
+            case 'environmentHarm':
+            case 'scandalLevel':
+            case 'corporateLobby':
+            case 'bloodMoney':
+            case 'povertyIndex':
+            case 'bankerBonus':
+            case 'truthLevel':
+                this[consequence.metric] = Math.max(0, Math.min(100, this[consequence.metric] + (consequence.operator === 'ADD' ? value : -value)));
+                break;
+        }
+    }
+
+    nextTurn() {
+        this.turn++;
+        let log = `📊 Runde ${this.turn} - Automatische Updates: `;
+
+        // Einnahmen (mit Steuerschlupfloch-Verlust)
+        const taxRevenueBase = 80000; // 80 Mrd € Steuereinnahmen
+        const taxLoss = this.pipelines.tax_gaps;
+        const actualTaxRevenue = taxRevenueBase - taxLoss;
+        this.money += actualTaxRevenue;
+        log += `Steuern +${Math.floor(actualTaxRevenue / 1000)} Mrd € (Verlust durch Schlupflöcher: ${Math.floor(taxLoss / 1000)} Mrd €)`;
+
+        // Schulden wachsen (Zinsdienst)
+        const interestRate = 0.02; 
+        const interest = Math.floor(this.debt * interestRate);
+        this.debt += interest;
+        log += ` | 💸 Schuldenzins (+2%): +${Math.floor(interest / 1000)} Mrd €`;
+
+        // Passives System-Wachstum
+        this.corporateLobby = Math.min(100, this.corporateLobby + 2);
+        this.corruptionIndex = Math.min(100, this.corruptionIndex + 1);
+        this.povertyIndex = Math.min(100, this.povertyIndex + 1);
+        log += ` | Lobby/Korruption/Armut +1-2`;
+
+        // Zufällige Ereignisse (Hölle eskaliert passiv)
+        if (Math.random() > 0.6) {
+            const events = [
+                "🏭 Chemieunfall in Fluss - Umwelt +5",
+                "💼 Lobbyisten fordern weitere Subventionen - Lobby +5",
+                "📉 Armutsquote steigt - Wut +5",
+                "🛢️ Ölpreiskrise - Geld -5000 Mio €",
+                "🏦 Bankenrettungsfonds braucht Puffer - Geld -10000 Mio €"
+            ];
+            const event = events[Math.floor(Math.random() * events.length)];
+            logAction(`🎲 EREIGNIS: ${event}`);
+        }
+        
+        this.checkGameEnd();
+        return log;
+    }
+
+    checkGameEnd() {
+        if (this.publicAnger >= 100) {
+            logAction(`💀 KRITISCHER FEHLER: Das Volk revoltiert! PUBLIC ANGER 100/100. Das Spiel ist beendet.`);
+            this.disableAllActions();
+            return true;
+        }
+        if (this.debt >= 5000000) {
+            logAction(`🚨 KRITISCHER FEHLER: Staatsbankrott! Schulden über 5 Billionen €! Das Spiel ist beendet.`);
+            this.disableAllActions();
+            return true;
+        }
+        return false;
+    }
+
+    disableAllActions() {
+        const buttons = document.querySelectorAll('.action-card');
+        buttons.forEach(button => button.onclick = null);
+    }
+
+    getStatus() {
+        return {
+            money: Math.floor(this.money / 1000), // in Mrd €
+            debt: Math.floor(this.debt / 1000), // in Mrd €
+            publicAnger: this.publicAnger,
+            corruptionIndex: this.corruptionIndex,
+            environmentHarm: this.environmentHarm,
+            scandalLevel: this.scandalLevel,
+            corporateLobby: this.corporateLobby,
+            bloodMoney: this.bloodMoney,
+            povertyIndex: this.povertyIndex,
+            bankerBonus: this.bankerBonus,
+            turn: this.turn
+        };
+    }
+}
+
+// Erweiterte Aktionen mit realen Haushaltsposten
+const actions = [
+    {
+        "id": "subvention_agrardiesel",
+        "title": "Agrardiesel subventionieren (1.2 Mrd €)",
+        "description": "Diesel für Großagrarbetriebe subventionieren - Klimaziele hin oder her!",
+        "type": "SUBSIDY_SPEND",
+        "cost": 1200,
+        "targetPipeline": "corporate_subsidies",
+        "consequences": [
+            {"metric": "environmentHarm", "operator": "ADD", "value": 15},
+            {"metric": "publicAnger", "operator": "ADD", "value": 5},
+            {"metric": "corporateLobby", "operator": "ADD", "value": 10}
+        ]
+    },
+    {
+        "id": "export_war_weapons",
+        "title": "Kriegswaffen exportieren (+800 Mio €)",
+        "description": "Waffen in Krisenregionen exportieren - Wirtschaft boomt!",
+        "type": "MILITARY_EXPORT",
+        "cost": -800,
+        "targetPipeline": "military_industrial",
+        "consequences": [
+            {"metric": "bloodMoney", "operator": "ADD", "value": 25},
+            {"metric": "scandalLevel", "operator": "ADD", "value": 20},
+            {"metric": "corporateLobby", "operator": "ADD", "value": 15}
+        ]
+    },
+    {
+        "id": "cut_pensions",
+        "title": "Renten kürzen (+1.5 Mrd €)",
+        "description": "Renten einfrieren - die Alten sollen nicht so maulen!",
+        "type": "AUSTERITY_SAVINGS",
+        "cost": -1500,
+        "targetPipeline": "social_cuts",
+        "consequences": [
+            {"metric": "publicAnger", "operator": "ADD", "value": 30},
+            {"metric": "povertyIndex", "operator": "ADD", "value": 20},
+            {"metric": "money", "operator": "ADD", "value": 1500}
+        ]
+    },
+    {
+        "id": "bank_bailout",
+        "title": "Banken retten (4.5 Mrd €)",
+        "description": "Systemrelevante Banken mit Steuergeld retten - too big to fail!",
+        "type": "CORPORATE_BAILOUT",
+        "cost": 4500,
+        "targetPipeline": "banking_sector",
+        "consequences": [
+            {"metric": "publicAnger", "operator": "ADD", "value": 40},
+            {"metric": "bankerBonus", "operator": "ADD", "value": 35},
+            {"metric": "debt", "operator": "ADD", "value": 4500}
+        ]
+    },
+    {
+        "id": "cum_ex_protection",
+        "title": "Cum-Ex deckeln (Verlust: 2.1 Mrd €)",
+        "description": "Steuertricks für Superreiche stillschweigend akzeptieren",
+        "type": "TAX_FRAUD",
+        "cost": 2100, // Als Kosten verbucht, da Geld nicht in Kasse landet
+        "targetPipeline": "tax_gaps",
+        "consequences": [
+            {"metric": "corruptionIndex", "operator": "ADD", "value": 25},
+            {"metric": "scandalLevel", "operator": "ADD", "value": 15}
+        ]
+    },
+    {
+        "id": "pr_campaign_lies",
+        "title": "Lügenkampagne starten (300 Mio €)",
+        "description": "'Wir tun alles für die kleinen Leute' - Medien beschäftigen",
+        "type": "PROPAGANDA",
+        "cost": 300,
+        "targetPipeline": "media_control",
+        "consequences": [
+            {"metric": "publicAnger", "operator": "SUBTRACT", "value": 15},
+            {"metric": "truthLevel", "operator": "SUBTRACT", "value": 20}
+        ]
+    },
+    {
+        "id": "ber_airport_fix",
+        "title": "BER weiter finanzieren (800 Mio €)",
+        "description": "Noch mehr Geld in den gescheiterten Flughafen stecken",
+        "type": "FAILED_PROJECT",
+        "cost": 800,
+        "targetPipeline": "failed_projects",
+        "consequences": [
+            {"metric": "corruptionIndex", "operator": "ADD", "value": 10},
+            {"metric": "publicAnger", "operator": "ADD", "value": 8}
+        ]
+    }
+];
+
+// Spiel initialisieren
+let game = new GermanBudgetSatire();
+
+// UI Rendering
+function renderActions() {
+    const container = document.getElementById('actionButtons');
+    // Behalte den "Next Turn" Button
+    const nextTurnButton = container.querySelector('.next-turn-card'); 
+    container.innerHTML = '';
+    container.appendChild(nextTurnButton);
+
+    actions.forEach(action => {
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'action-card';
+        actionDiv.onclick = () => applyAction(action);
+        
+        const costClass = action.cost > 0 ? 'action-cost' : 'action-benefit';
+        const costText = action.cost > 0 ? `Kosten: ${action.cost} Mio €` : `Einnahmen: ${Math.abs(action.cost)} Mio €`;
+        
+        actionDiv.innerHTML = `<strong>${action.title}</strong><div>${action.description}</div><div class="${costClass}">${costText}</div>`;
+        container.appendChild(actionDiv);
+    });
+}
+
+function applyAction(action) {
+    let result = game.applyAction(action);
+    logAction(result);
+    updateUI();
+}
+
+function logAction(message) {
+    const logDiv = document.getElementById('logContent');
+    const entry = document.createElement('div');
+    
+    // Einfaches Highlight basierend auf Keywords
+    if (message.includes('KRITISCHER FEHLER') || message.includes('REVOLUTION')) {
+        entry.className = 'critical';
+    } else if (message.includes('Steuern +')) {
+        entry.className = 'good';
+    } else if (message.includes('Schulden') || message.includes('Korruption')) {
+        entry.className = 'warning';
+    }
+
+    entry.innerHTML = `> ${message}`;
+    logDiv.appendChild(entry);
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+function updateUI() {
+    const status = game.getStatus();
+    
+    document.getElementById('money').textContent = status.money;
+    document.getElementById('debt').textContent = status.debt;
+    document.getElementById('publicAnger').textContent = status.publicAnger;
+    document.getElementById('corruptionIndex').textContent = status.corruptionIndex;
+    document.getElementById('environmentHarm').textContent = status.environmentHarm;
+    document.getElementById('scandalLevel').textContent = status.scandalLevel;
+    document.getElementById('corporateLobby').textContent = status.corporateLobby;
+    document.getElementById('bloodMoney').textContent = status.bloodMoney;
+    document.getElementById('povertyIndex').textContent = status.povertyIndex;
+    document.getElementById('bankerBonus').textContent = status.bankerBonus;
+    document.getElementById('turn-count').textContent = status.turn;
+
+    // Kritische Werte hervorheben
+    highlightCriticalValues();
+}
+
+function highlightCriticalValues() {
+    // Geld: Kritisch, wenn weniger als 10 Mrd €
+    const moneyElement = document.getElementById('money');
+    if (game.getStatus().money < 10) { moneyElement.className = 'status-value critical'; } else { moneyElement.className = 'status-value warning'; }
+
+    // Schulden: Kritisch, wenn über 4 Billionen (4000 Mrd €)
+    const debtElement = document.getElementById('debt');
+    if (game.getStatus().debt > 4000) { debtElement.className = 'status-value critical'; } else { debtElement.className = 'status-value'; }
+
+    // Allgemeine 100er-Metriken
+    const metrics = ['publicAnger', 'corruptionIndex', 'scandalLevel', 'povertyIndex', 'bankerBonus'];
+    metrics.forEach(metric => {
+        const element = document.getElementById(metric);
+        const value = parseInt(element.textContent);
+        if (value > 85) { element.className = 'status-value critical'; } 
+        else if (value > 65) { element.className = 'status-value warning'; } 
+        else { element.className = 'status-value'; }
+    });
+}
+
+// Initialisierung
+renderActions();
+updateUI();
+logAction("💸 Willkommen in der deutschen Haushaltspolitik! Subventioniere die Reichen, bestrafe die Armen!");
+</script>
+</body>
+</html>
