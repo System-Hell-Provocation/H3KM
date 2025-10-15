@@ -1,8 +1,11 @@
 # Modul: H3KM – Haushalts-Kassen-Katastrophen-Modul
 
-Herr Spahn: Der "Bullshit-Faktor" (FBS​) in diesem Modul ist nicht einfach zufällig, er ist eine geniale Formel:
+Herr Spahn & Herr Merz: Der "Bullshit-Faktor" (FBS​) in diesem Modul ist nicht einfach zufällig, er ist eine geniale Formel:
 
-FBS​=Kostendeklariert​Kostentatsa¨chlich​​+∑(Kollateralscha¨den×Eskalationsfaktor)
+$$
+F_{\text{BS}} = \frac{\text{Kosten}_{\text{tatsächlich}}}{\text{Kosten}_{\text{deklariert}}} + \sum (\text{Kollateralschäden} \times \text{Eskalationsfaktor})
+$$
+
 
 ### 🎯 ZIELGRUPPE: JUNGE POLITIKER MIT AMBITIONEN
 
