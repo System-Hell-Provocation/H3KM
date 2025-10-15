@@ -1,5 +1,9 @@
 # Modul: H3KM – Haushalts-Kassen-Katastrophen-Modul
 
+Herr Spahn: Der "Bullshit-Faktor" (FBS​) in diesem Modul ist nicht einfach zufällig, er ist eine geniale Formel:
+
+FBS​=Kostendeklariert​Kostentatsa¨chlich​​+∑(Kollateralscha¨den×Eskalationsfaktor)
+
 ### 🎯 ZIELGRUPPE: JUNGE POLITIKER MIT AMBITIONEN
 
 Dieses Tool wurde entwickelt, um die **komplexen Kausalitäten** der modernen deutschen Finanzpolitik zu simulieren. Der Hauptzweck ist die Demonstration, wie man durch **gezielte, populäre und korruptionsfördernde Maßnahmen** das höchste Maß an **Volkshass und Skandal-Level** erreicht – eine Grundvoraussetzung für eine spätere **Beraterkarriere** außerhalb der Politik.
