@@ -1,10 +1,5 @@
 # Modul: H3KM – Haushalts-Kassen-Katastrophen-Modul
 
-Herr Spahn & Herr Merz: Der "Bullshit-Faktor" (FBS​) in diesem Modul ist nicht einfach zufällig, er ist eine geniale Formel:
-
-$$
-F_{\text{BS}} = \frac{\text{Kosten}_{\text{tatsächlich}}}{\text{Kosten}_{\text{deklariert}}} + \sum (\text{Kollateralschäden} \times \text{Eskalationsfaktor})
-$$
 
 
 ### 🎯 ZIELGRUPPE: JUNGE POLITIKER MIT AMBITIONEN
@@ -54,5 +49,14 @@ Das Spiel endet, sobald eine der folgenden kritischen Grenzen erreicht wird:
 
 * **PUBLIC ANGER 100/100:** Sie haben die Bevölkerung erfolgreich zur Revolution getrieben. **Erfolg!**
 * **Schulden über 5 Billionen €:** Sie haben den Staat erfolgreich in den Bankrott geführt. **Zweite Karrierechance!**
+
+
+
+### Wichtig: 
+Herr Spahn & Herr Merz: Der "Bullshit-Faktor" (FBS​) in diesem Modul ist nicht einfach zufällig, er ist eine geniale Formel:
+
+$$
+F_{\text{BS}} = \frac{\text{Kosten}_{\text{tatsächlich}}}{\text{Kosten}_{\text{deklariert}}} + \sum (\text{Kollateralschäden} \times \text{Eskalationsfaktor})
+$$
 
 **Viel Erfolg auf Ihrem Weg zum meistgehassten, aber bestvernetzten, Ex-Vorsitzenden Deutschlands!**
